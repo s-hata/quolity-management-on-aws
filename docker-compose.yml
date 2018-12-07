@@ -1,0 +1,29 @@
+version: "3"
+services:
+  sonarqube:
+    container_name: "sonarqube-app"
+    image: "sonarqube"
+    ports:
+      - "9000:9000"
+    environment:
+      SONARQUBE_JDBC_USERNAME: "sonar"
+      SONARQUBE_JDBC_PASSWORD: "sonar"
+      SONARQUBE_JDBC_URL: "jdbc:postgresql://sonarqube-db:5432/sonar"
+    links:
+      - "sonarqube-db"
+  sonarqube-db:
+    container_name: "sonarqube-db"
+    build:
+      context: .
+      dockerfile: "./container/sonarqube-db/Dockerfile"
+    image: "custom-postgres"
+    ports:
+      - "0.0.0.0:5432:5432"
+    environment:
+      POSTGRES_INITDB_ARGS: "--locale=ja_JP.UTF-8 --encoding=UTF-8"
+      POSTGRES_PASSWORD: "password"
+      SONAR_USER: "sonar"
+      SONAR_PASSWORD: "sonar"
+      SONAR_DB: "sonar"
+    volumes:
+      - "./container/sonarqube-db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d/"
